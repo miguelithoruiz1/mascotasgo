@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { createServer as createViteServer } from 'vite';
 import { analyzePetImage } from './src/server/geminiPetService.ts';
+import './src/server/freeLlmApiProvider.ts';
 import { requireAuth, optionalAuth, AuthRequest } from './src/middleware/auth.ts';
 import { getOrCreateUser } from './src/db/users.ts';
 import { getUserPets, insertUserPet, deleteUserPet } from './src/db/pets.ts';
