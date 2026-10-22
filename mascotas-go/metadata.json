@@ -1,0 +1,6 @@
+{
+  "name": "Mascotas Go",
+  "description": "Juego de exploración y colección móvil al estilo Pokémon GO para descubrir, fotografiar y registrar perros y gatos en tu ciudad en un mapa 3D con IA de Gemini.",
+  "requestFramePermissions": ["camera", "geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

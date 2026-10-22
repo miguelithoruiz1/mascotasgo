@@ -1,0 +1,18 @@
+{
+  "name": "Mascotas Go",
+  "short_name": "MascotasGo",
+  "description": "Juego de exploración y colección en realidad aumentada para fotografiar y catalogar perros y gatos reales.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#064e3b",
+  "theme_color": "#059669",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
