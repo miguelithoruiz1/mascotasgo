@@ -1,20 +1,38 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# Mascotas Go
 
-# Run and deploy your AI Studio app
+Juego de exploración y colección al estilo Pokémon GO para descubrir, fotografiar y registrar perros y gatos en tu ciudad, con mapa 3D e IA de Gemini.
 
-This contains everything you need to run your app locally.
+**App:** https://mascotas-go.ai.studio/
 
-View your app in AI Studio: https://ai.studio/apps/8c117466-ff42-4089-a0e6-5e5ec03afed3
+## Stack
 
-## Run Locally
+- **Frontend:** React 19 + Vite + TypeScript, Tailwind CSS 4, iconos Lucide
+- **Servidor:** Express (`server.ts`) — la clave de Gemini vive del lado del servidor, nunca en el cliente
+- **Mapa:** MapLibre GL + react-map-gl
+- **Datos y autenticación:** Supabase (datos + Supabase Auth; migración total en curso desde Firebase), Drizzle ORM sobre el Postgres de Supabase
+- **IA:** `@google/genai` (Gemini) para el reconocimiento de mascotas
 
-**Prerequisites:**  Node.js
+## Cómo correr en local
 
+Requisitos: Node.js 20 o superior.
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+1. Instala dependencias: `npm install`
+2. Crea el archivo `.env.local` con tu clave: `GEMINI_API_KEY=...` (las claves van en variables de entorno, **nunca** en el código ni en el repo)
+3. Arranca: `npm run dev`
+
+## Tests
+
+- `npm test` — suites de seguridad y aislamiento por cuenta, autorización HTTP, integridad de respaldos y preparación de Supabase
+- `npm run lint` — chequeo de tipos con TypeScript (`tsc --noEmit`)
+
+## Estructura
+
+- `src/` — aplicación React (components, context, services, server, db, lib, types)
+- `server.ts` — servidor Express y endpoints
+- `supabase/` — esquema SQL y políticas de seguridad (RLS)
+- `tests/` — suites de seguridad, autorización y respaldo
+- `scripts/` — utilidades: verificación de conexión a Supabase y respaldo lógico
+
+## Estado del proyecto
+
+Migración total a Supabase en curso: datos y autenticación pasan a Supabase y Firebase se retira del proyecto. Los datos de cada cuenta están aislados por usuario y se sincronizan con el servidor.
