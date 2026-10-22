@@ -9,7 +9,7 @@ Juego de exploración y colección al estilo Pokémon GO para descubrir, fotogra
 - **Frontend:** React 19 + Vite + TypeScript, Tailwind CSS 4, iconos Lucide
 - **Servidor:** Express (`server.ts`) — la clave de Gemini vive del lado del servidor, nunca en el cliente
 - **Mapa:** MapLibre GL + react-map-gl
-- **Datos y autenticación:** Firebase Authentication + Supabase (datos; migración en curso), Drizzle ORM
+- **Datos y autenticación:** Supabase (datos + Supabase Auth; migración total en curso desde Firebase), Drizzle ORM sobre el Postgres de Supabase
 - **IA:** `@google/genai` (Gemini) para el reconocimiento de mascotas
 
 ## Cómo correr en local
@@ -35,4 +35,4 @@ Requisitos: Node.js 20 o superior.
 
 ## Estado del proyecto
 
-Migración de datos a Supabase en curso, manteniendo Firebase Authentication. Los datos de cada cuenta están aislados por usuario y se sincronizan con el servidor.
+Migración total a Supabase en curso: datos y autenticación pasan a Supabase y Firebase se retira del proyecto. Los datos de cada cuenta están aislados por usuario y se sincronizan con el servidor.
