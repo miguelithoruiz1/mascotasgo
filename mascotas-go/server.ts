@@ -24,6 +24,9 @@ export async function createServerApp() {
   const app = express();
   const isProd = process.env.NODE_ENV === 'production';
   const isTest = process.env.NODE_ENV === 'test';
+  // En Vercel (serverless) esta app solo atiende /api/*: los archivos
+  // estáticos de `dist` los sirve la plataforma, nunca Express.
+  const isServerless = Boolean(process.env.VERCEL);
 
   // Support large base64 image payloads (up to 25MB)
   app.use(express.json({ limit: '25mb' }));
@@ -243,7 +246,7 @@ export async function createServerApp() {
     }
   });
 
-  if (!isTest) {
+  if (!isTest && !isServerless) {
     if (!isProd) {
       // Mount Vite dev middleware
       const vite = await createViteServer({
