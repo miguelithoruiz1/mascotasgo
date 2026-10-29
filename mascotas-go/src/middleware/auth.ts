@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { adminAuth } from '../lib/firebase-admin.ts';
 
 export interface AuthenticatedUser {
   uid: string;
@@ -62,7 +61,12 @@ async function verifyBearerToken(token: string): Promise<AuthenticatedUser | nul
   }
 
   // 3. Fallback de transición con Firebase mientras se completa el reemplazo
+  // Import dinámico: firebase-admin arrastra jwks-rsa/jose, incompatibles
+  // con el runtime de Vercel (ERR_REQUIRE_ESM); así solo se carga si un
+  // token llega a este paso, nunca al arrancar la función. Si la carga
+  // falla, el catch devuelve null y la ruta sigue su camino normal.
   try {
+    const { adminAuth } = await import('../lib/firebase-admin.ts');
     const decodedToken = await adminAuth.verifyIdToken(token);
     return {
       uid: decodedToken.uid,
