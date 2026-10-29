@@ -2,7 +2,6 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
-import { createServer as createViteServer } from 'vite';
 import { analyzePetImage } from './src/server/geminiPetService.ts';
 import './src/server/freeLlmApiProvider.ts';
 import { requireAuth, optionalAuth, AuthRequest } from './src/middleware/auth.ts';
@@ -248,7 +247,10 @@ export async function createServerApp() {
 
   if (!isTest && !isServerless) {
     if (!isProd) {
-      // Mount Vite dev middleware
+      // Mount Vite dev middleware (import dinámico: en serverless nunca
+      // se carga Vite ni su bundler rolldown, que no tiene binding nativo
+      // en el runtime de Vercel y tumbaba la función al arrancar)
+      const { createServer: createViteServer } = await import('vite');
       const vite = await createViteServer({
         server: { middlewareMode: true },
         appType: 'spa',
