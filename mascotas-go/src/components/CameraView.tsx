@@ -482,29 +482,17 @@ export const CameraView: React.FC<CameraViewProps> = ({
         sounds.playReject();
       }
     } catch (_err: unknown) {
-      const isDog = arPetType === 'dog' || liveDetection.species === 'perro' || Math.random() > 0.45;
-
-      const fallback: IdentificationResult = {
-        has_pet: true,
-        species: isDog ? 'perro' : 'gato',
-        name_suggestion: isDog ? 'Lomito Campeón' : 'Michi Sigiloso',
-        breed: isDog ? 'Golden Retriever Alegre' : 'Siamés de Ojos Celestes',
-        color: isDog ? 'Dorado resplandeciente' : 'Crema y chocolate',
-        mood: isDog ? 'Enérgico y juguetón' : 'Curioso y elegante',
-        rarity: 'Raro',
-        cute_score: 98,
-        xp_reward: 160,
-        description: isDog
-          ? '¡Un leal perrito avistado y capturado exitosamente en tu expedición!'
-          : '¡Un gato majestuoso con una mirada fascinante!',
-        fun_fact: isDog
-          ? 'Los perros tienen un sentido del olfato hasta 100,000 veces más sensible que el de los humanos.'
-          : 'Los gatos pueden rotar sus orejas 180 grados de forma independiente.',
-        rejection_reason: null,
-      };
-
-      setAnalysisResult(fallback);
-      setEditedName(fallback.name_suggestion || 'Amigo Peludo');
+      // Sin inventos: si la IA no respondió, se avisa con el estado de
+      // rechazo que ya existe (botón "Volver a la Cámara en Vivo") y NO
+      // se registra ninguna mascota falsa.
+      sounds.playReject();
+      setAnalysisResult({
+        has_pet: false,
+        species: 'otro',
+        rejection_reason:
+          'No se pudo analizar la foto porque la IA no respondió. Revisa tu conexión y vuelve a intentarlo: la foto no se registró en tu Petdex.',
+      });
+      setEditedName('Amigo Peludo');
     } finally {
       setIsAnalyzing(false);
     }

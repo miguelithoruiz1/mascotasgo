@@ -254,24 +254,37 @@ export class PetVisionOrchestrator {
     imageBase64: string,
     isLiveScan: boolean = false
   ): Promise<EnhancedIdentificationResult> {
-    // 1. Buscar un proveedor de IA real que esté configurado
-    const activeAIProvider = this.providers.find((p) => p.isAvailable());
-
-    if (activeAIProvider) {
+    // 1. Probar cada proveedor de IA real configurado, en orden.
+    // Antes solo se intentaba el primero y cualquier fallo caía directo
+    // al catálogo, que inventaba una mascota. Eso ya no pasa en capturas.
+    let lastError: unknown = null;
+    for (const provider of this.providers) {
+      if (!provider.isAvailable()) continue;
       try {
-        const aiResult = await activeAIProvider.analyze(imageBase64, isLiveScan);
+        const aiResult = await provider.analyze(imageBase64, isLiveScan);
         return {
           ...aiResult,
           _analysisSource: 'ai_model',
-          _providerName: activeAIProvider.name,
+          _providerName: provider.name,
         };
       } catch (err) {
-        console.warn(`[AI Vision] Error en proveedor "${activeAIProvider.name}". Activando fallback heurístico por seguridad:`, err);
+        lastError = err;
+        console.warn(`[AI Vision] Error en proveedor "${provider.name}". Probando el siguiente:`, err);
       }
     }
 
-    // 2. Si no hay modelo de IA configurado o falló la llamada remota:
-    // Se ejecuta el clasificador basado en reglas y se etiqueta HONESTAMENTE como contingencia local
+    // 2. Sin IA disponible o con todos los proveedores fallando:
+    // en una CAPTURA no se inventa ninguna mascota: se lanza el error
+    // para que la ruta responda 500 y la app muestre el aviso + reintento.
+    // El catálogo solo queda para el escaneo en vivo (vista previa, nunca
+    // registra una mascota).
+    if (!isLiveScan) {
+      console.error('[AI Vision] Sin proveedor de IA disponible para la captura:', lastError);
+      throw new Error(
+        'La IA de identificación no está disponible en este momento. Inténtalo de nuevo.'
+      );
+    }
+
     const fallbackResult = this.fallback.classify(imageBase64, isLiveScan);
     return {
       ...fallbackResult,
