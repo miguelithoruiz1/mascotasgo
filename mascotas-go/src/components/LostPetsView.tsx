@@ -34,7 +34,7 @@ export const LostPetsView: React.FC<LostPetsViewProps> = ({
   onLocateOnMap,
   userCoords,
 }) => {
-  const { user, signInWithGoogle, getIdToken } = useAuth();
+  const { user, getIdToken } = useAuth();
   const [filterSpecies, setFilterSpecies] = useState<'all' | 'perro' | 'gato'>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
@@ -79,8 +79,7 @@ export const LostPetsView: React.FC<LostPetsViewProps> = ({
   const handleSubmitReport = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
-      alert('Debes iniciar sesión con Google para publicar un reporte de mascota perdida.');
-      signInWithGoogle();
+      alert('Inicia sesión con tu correo desde tu perfil para publicar un reporte de mascota perdida.');
       return;
     }
 
@@ -160,8 +159,7 @@ export const LostPetsView: React.FC<LostPetsViewProps> = ({
               onClick={() => {
                 sounds.playTap();
                 if (!user) {
-                  alert('Inicia sesión con Google para publicar un reporte.');
-                  signInWithGoogle();
+                  alert('Inicia sesión con tu correo desde tu perfil para publicar un reporte.');
                 } else {
                   setIsReportModalOpen(true);
                 }
@@ -559,8 +557,7 @@ export const LostPetsView: React.FC<LostPetsViewProps> = ({
                     if (selectedLostPet.contactPhone.includes('***')) {
                       e.preventDefault();
                       if (!user) {
-                        alert('Para proteger la privacidad de la comunidad, inicia sesión con Google para ver el teléfono verificado y llamar.');
-                        signInWithGoogle();
+                        alert('Para proteger la privacidad de la comunidad, inicia sesión con tu correo desde tu perfil para ver el teléfono verificado y llamar.');
                         return;
                       }
                       try {

@@ -43,7 +43,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   onSeedDemoData,
   onClearAll,
 }) => {
-  const { user, signInWithGoogle, signInWithEmail, signUpWithEmail, signOut, loading: authLoading } = useAuth();
+  const { user, signInWithEmail, signUpWithEmail, signOut, loading: authLoading } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [authEmail, setAuthEmail] = useState<string>('');
@@ -552,28 +552,6 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                   )}
                 </button>
               </form>
-
-              <div className="relative flex py-1 items-center">
-                <div className="flex-grow border-t border-slate-800" />
-                <span className="flex-shrink mx-2 text-[10px] text-slate-500 font-semibold uppercase">O también</span>
-                <div className="flex-grow border-t border-slate-800" />
-              </div>
-
-              <button
-                type="button"
-                onClick={async () => {
-                  sounds.playTap();
-                  setAuthError(null);
-                  try {
-                    await signInWithGoogle();
-                  } catch (e: any) {
-                    setAuthError(e.message || 'Error con Google OAuth en Supabase');
-                  }
-                }}
-                className="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-750 border border-slate-700 text-xs font-semibold text-slate-200 flex items-center justify-center gap-2 active:scale-95 transition-all"
-              >
-                <span>🌐 Continuar con Google</span>
-              </button>
 
               <div className="pt-2 text-center border-t border-slate-800/80">
                 <button
