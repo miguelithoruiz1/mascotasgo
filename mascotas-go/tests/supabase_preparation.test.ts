@@ -105,23 +105,37 @@ async function runTests() {
 
   // Análisis mediante el orquestador
   const fakeSampleImage = 'data:image/jpeg;base64,' + Buffer.from('test_image_data').toString('base64');
-  const result = await petVisionOrchestrator.identifyPet(fakeSampleImage, false);
-
-  assert(
-    result.has_pet === true && Boolean(result.species),
-    'PRUEBA 8: El orquestador resuelve exitosamente el análisis de imagen'
-  );
-
-  assert(
-    result._analysisSource === 'rule_based_fallback' || result._analysisSource === 'ai_model',
-    'PRUEBA 9: El resultado reporta honestamente su fuente (_analysisSource)'
-  );
-
-  if (result._analysisSource === 'rule_based_fallback') {
+  let result: Awaited<ReturnType<typeof petVisionOrchestrator.identifyPet>> | null = null;
+  try {
+    result = await petVisionOrchestrator.identifyPet(fakeSampleImage, false);
+  } catch (err: any) {
+    // Sin ningún proveedor de IA configurado (p. ej. el CI, sin claves),
+    // el orquestador rechaza la captura con un error honesto en lugar de
+    // inventar una mascota: ese ES el comportamiento esperado aquí.
+    console.log('⏭️  SKIP: PRUEBAS 8-10 omitidas, sin proveedor de IA disponible en este entorno.');
     assert(
-      result._providerName.includes('Fallback'),
-      'PRUEBA 10: La contingencia local informa claramente que proviene del fallback basado en catálogo'
+      String(err?.message || '').includes('no está disponible'),
+      'PRUEBA 8: Sin IA disponible, el orquestador rechaza la captura con error honesto en lugar de inventar una mascota'
     );
+  }
+
+  if (result) {
+    assert(
+      result.has_pet === true && Boolean(result.species),
+      'PRUEBA 8: El orquestador resuelve exitosamente el análisis de imagen'
+    );
+
+    assert(
+      result._analysisSource === 'rule_based_fallback' || result._analysisSource === 'ai_model',
+      'PRUEBA 9: El resultado reporta honestamente su fuente (_analysisSource)'
+    );
+
+    if (result._analysisSource === 'rule_based_fallback') {
+      assert(
+        result._providerName.includes('Fallback'),
+        'PRUEBA 10: La contingencia local informa claramente que proviene del fallback basado en catálogo'
+      );
+    }
   }
 
   // =========================================================================
@@ -147,9 +161,12 @@ async function runTests() {
       'PRUEBA 11: Bloqueo estricto de fallback silencioso a Cloud SQL cuando DATABASE_URL está configurada'
     );
   } finally {
-    // Restaurar entorno
-    process.env.DATABASE_URL = originalUrl;
-    process.env.ALLOW_TEST_FALLBACK = originalFallbackFlag;
+    // Restaurar entorno: si la variable no existía, borrarla. Asignar
+    // undefined la dejaría como el texto "undefined" y rompería la PRUEBA 12.
+    if (originalUrl === undefined) delete process.env.DATABASE_URL;
+    else process.env.DATABASE_URL = originalUrl;
+    if (originalFallbackFlag === undefined) delete process.env.ALLOW_TEST_FALLBACK;
+    else process.env.ALLOW_TEST_FALLBACK = originalFallbackFlag;
     global._postgresPool = originalPool;
   }
 
