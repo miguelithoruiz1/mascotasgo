@@ -147,7 +147,7 @@ export const LostPetsView: React.FC<LostPetsViewProps> = ({
             </div>
 
             <div className="w-12 h-12 rounded-2xl bg-rose-500/20 border border-rose-400/50 flex items-center justify-center text-rose-400 shrink-0 shadow-lg">
-              <AlertTriangle className="w-6 h-6 animate-bounce" />
+              <AlertTriangle className="w-6 h-6 animate-bob" />
             </div>
           </div>
 

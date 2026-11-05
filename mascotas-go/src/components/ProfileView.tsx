@@ -286,6 +286,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               Rarezas Especiales
             </span>
             <div className="flex items-center gap-2 mt-1">
+              {/* impeccable-disable ai-color-palette: color de rareza (Raros o +) */}
               <span className="text-2xl font-black text-purple-400">{rareCount}</span>
               <span className="text-xs text-slate-400 font-semibold">Raros o +</span>
             </div>

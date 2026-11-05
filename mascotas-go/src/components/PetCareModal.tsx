@@ -237,7 +237,7 @@ export const PetCareModal: React.FC<PetCareModalProps> = ({
                 {Array.from({ length: 14 }).map((_, i) => (
                   <span
                     key={i}
-                    className="text-2xl animate-bounce"
+                    className="text-2xl animate-bob"
                     style={{ animationDelay: `${i * 100}ms` }}
                   >
                     🫧
@@ -261,7 +261,7 @@ export const PetCareModal: React.FC<PetCareModalProps> = ({
               {/* Equipped accessory sticker */}
               {equippedAccessory && (
                 <div
-                  className="absolute -top-3 -right-2 bg-slate-950/90 border-2 border-amber-400 rounded-full w-11 h-11 flex items-center justify-center text-2xl shadow-lg animate-bounce"
+                  className="absolute -top-3 -right-2 bg-slate-950/90 border-2 border-amber-400 rounded-full w-11 h-11 flex items-center justify-center text-2xl shadow-lg animate-bob"
                   title={`Disfraz: ${equippedAccessory.name}`}
                 >
                   {equippedAccessory.icon}

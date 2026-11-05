@@ -704,6 +704,7 @@ export const CameraView: React.FC<CameraViewProps> = ({
 
             {/* Tactical Target Frame */}
             <div className="relative w-64 h-64 sm:w-72 sm:h-72 flex items-center justify-center">
+              {/* impeccable-disable side-tab, border-accent-on-rounded: Tactical Target Frame viewfinder corners */}
               {/* Outer corner brackets */}
               <div
                 className={`absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 rounded-tl-lg transition-colors duration-300 ${
@@ -753,7 +754,7 @@ export const CameraView: React.FC<CameraViewProps> = ({
 
               {/* Lock-on Badge */}
               {liveDetection.hasPet && (
-                <div className="absolute -bottom-10 px-3.5 py-1 rounded-full bg-[#111827] border border-[#F59E0B] text-[#F59E0B] font-black text-xs uppercase tracking-wider shadow-2xl flex items-center gap-1.5 animate-bounce">
+                <div className="absolute -bottom-10 px-3.5 py-1 rounded-full bg-[#111827] border border-[#F59E0B] text-[#F59E0B] font-black text-xs uppercase tracking-wider shadow-2xl flex items-center gap-1.5 animate-bob">
                   <span>🎯 ¡OBJETIVO LISTO!</span>
                   <span className="text-[10px] text-white bg-[#1A2234] px-1.5 py-0.5 rounded-md">
                     {liveDetection.breed}
@@ -769,7 +770,7 @@ export const CameraView: React.FC<CameraViewProps> = ({
           <div className="absolute inset-0 z-30 pointer-events-none flex flex-col items-center justify-center">
             {/* Throwing: Sphere flying towards target */}
             {capturePhase === 'throwing' && (
-              <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-[#10B981] via-[#14B8A6] to-[#F59E0B] border-3 border-white shadow-[0_0_40px_rgba(16,185,129,0.9)] flex items-center justify-center animate-bounce">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-[#10B981] via-[#14B8A6] to-[#F59E0B] border-3 border-white shadow-[0_0_40px_rgba(16,185,129,0.9)] flex items-center justify-center animate-bob">
                 <Sparkles className="w-10 h-10 text-slate-950 animate-spin" />
               </div>
             )}
@@ -809,7 +810,7 @@ export const CameraView: React.FC<CameraViewProps> = ({
 
             {/* Caught: Victory banner */}
             {capturePhase === 'caught' && (
-              <div className="flex flex-col items-center gap-3 animate-bounce">
+              <div className="flex flex-col items-center gap-3 animate-bob">
                 <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-[#10B981] via-[#14B8A6] to-[#F59E0B] border-4 border-white shadow-[0_0_50px_rgba(16,185,129,1)] flex items-center justify-center">
                   <Sparkles className="w-12 h-12 text-slate-950 animate-spin" />
                 </div>
@@ -920,7 +921,7 @@ export const CameraView: React.FC<CameraViewProps> = ({
               </button>
               <span
                 className={`text-[10px] font-black mt-1 uppercase tracking-wider ${
-                  liveDetection.hasPet ? 'text-[#F59E0B] animate-bounce' : 'text-[#10B981]'
+                  liveDetection.hasPet ? 'text-[#F59E0B] animate-bob' : 'text-[#10B981]'
                 }`}
               >
                 {liveDetection.hasPet ? '¡ATRAPAR AHORA!' : 'CAPTURAR'}

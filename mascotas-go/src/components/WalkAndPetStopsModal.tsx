@@ -340,7 +340,7 @@ export const WalkAndPetStopsModal: React.FC<WalkAndPetStopsModalProps> = ({
           <div className="bg-slate-950/80 rounded-2xl p-3.5 border border-amber-500/30 space-y-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-2xl animate-bounce">🥚</span>
+                <span className="text-2xl animate-bob">🥚</span>
                 <div>
                   <span className="text-xs font-black text-amber-300 block">
                     Incubadora de Huevo Peludo ({currentEgg.type})

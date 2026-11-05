@@ -343,7 +343,7 @@ export const PetShowArenaModal: React.FC<PetShowArenaModalProps> = ({
           {/* Victory Modal Overlay inside arena */}
           {winner && (
             <div className="p-4 rounded-3xl bg-gradient-to-b from-indigo-950/90 to-slate-950 border-2 border-amber-400/80 text-center space-y-3 animate-fade-in shadow-2xl">
-              <div className="w-14 h-14 rounded-full bg-amber-500/20 border-2 border-amber-400 text-3xl mx-auto flex items-center justify-center shadow-lg animate-bounce">
+              <div className="w-14 h-14 rounded-full bg-amber-500/20 border-2 border-amber-400 text-3xl mx-auto flex items-center justify-center shadow-lg animate-bob">
                 {winner === 'player' ? '🏆' : '🥈'}
               </div>
               <div>

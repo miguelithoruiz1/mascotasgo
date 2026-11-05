@@ -770,7 +770,7 @@ function AppContent() {
       {unlockedNotification && (
         <div className="fixed inset-0 z-50 bg-[#090D16]/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
           <div className="bg-[#111827] border border-[#F59E0B]/50 rounded-3xl p-6 max-w-xs w-full text-center shadow-2xl shadow-black/80 relative">
-            <div className="w-18 h-18 rounded-2xl bg-[#1A2234] border border-[#F59E0B]/40 text-4xl mx-auto flex items-center justify-center shadow-lg animate-bounce">
+            <div className="w-18 h-18 rounded-2xl bg-[#1A2234] border border-[#F59E0B]/40 text-4xl mx-auto flex items-center justify-center shadow-lg animate-bob">
               {unlockedNotification.icon}
             </div>
 

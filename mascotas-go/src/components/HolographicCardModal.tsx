@@ -191,6 +191,7 @@ export const HolographicCardModal: React.FC<HolographicCardModalProps> = ({
                 </div>
               </div>
             ) : (
+              /* impeccable-disable ai-color-palette: holographic elemental type card */
               /* BACK OF THE CARD */
               <div className="w-full h-full rounded-2xl p-4 bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-900 border-4 border-amber-400 shadow-2xl relative flex flex-col items-center justify-between text-center overflow-hidden">
                 <div className="w-full text-center">

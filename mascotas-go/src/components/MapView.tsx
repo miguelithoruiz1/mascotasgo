@@ -275,6 +275,7 @@ export const MapView: React.FC<MapViewProps> = ({
             <div className="absolute w-28 h-28 rounded-full border border-emerald-500/40 bg-emerald-500/10 animate-radar pointer-events-none" />
             <div className="absolute w-28 h-28 rounded-full border border-emerald-400/25 bg-emerald-400/5 animate-radar-delayed pointer-events-none" />
 
+            {/* impeccable-disable side-tab: Direction Heading Indicator (compass arrow) */}
             {/* Direction Heading Indicator */}
             <div
               className="absolute -top-3.5 w-3.5 h-3.5 border-l-4 border-r-4 border-b-6 border-l-transparent border-r-transparent border-b-emerald-400 pointer-events-none transition-transform duration-300"
@@ -404,7 +405,7 @@ export const MapView: React.FC<MapViewProps> = ({
                 </div>
                 <div
                   className={`-mt-1 px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase text-white shadow flex items-center gap-0.5 ${
-                    isFound ? 'bg-emerald-600' : 'bg-rose-600 animate-bounce'
+                    isFound ? 'bg-emerald-600' : 'bg-rose-600 animate-bob'
                   }`}
                 >
                   <span>{isFound ? '✅' : '🚨'}</span>

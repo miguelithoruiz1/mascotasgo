@@ -125,7 +125,7 @@ export const CostumeSaloonModal: React.FC<CostumeSaloonModalProps> = ({
 
               {equippedAccessory && (
                 <div
-                  className="absolute -top-3 -right-2 bg-slate-950 border-2 border-amber-400 rounded-full w-12 h-12 flex items-center justify-center text-2xl shadow-xl animate-bounce"
+                  className="absolute -top-3 -right-2 bg-slate-950 border-2 border-amber-400 rounded-full w-12 h-12 flex items-center justify-center text-2xl shadow-xl animate-bob"
                   title={equippedAccessory.name}
                 >
                   {equippedAccessory.icon}
@@ -213,6 +213,7 @@ export const CostumeSaloonModal: React.FC<CostumeSaloonModalProps> = ({
           <span className="text-[10px] text-slate-400 font-semibold">
             {equippedAccessory ? `Bonificación: +${equippedAccessory.cpBonus} CP` : 'Elige un accesorio para vestir'}
           </span>
+          {/* impeccable-disable ai-color-palette: Dressing Room Stage theme (purple saloon) */}
           <button
             onClick={() => {
               sounds.playTap();

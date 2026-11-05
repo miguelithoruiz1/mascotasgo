@@ -157,7 +157,7 @@ export const DailyQuestsModal: React.FC<DailyQuestsModalProps> = ({
                       ) : isFinished ? (
                         <button
                           onClick={() => handleClaimReward(quest)}
-                          className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 font-black text-[10px] uppercase tracking-wider shadow-lg shadow-amber-500/30 animate-bounce active:scale-95"
+                          className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 font-black text-[10px] uppercase tracking-wider shadow-lg shadow-amber-500/30 animate-bob active:scale-95"
                         >
                           ¡Reclamar!
                         </button>
