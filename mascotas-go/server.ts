@@ -3,7 +3,9 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { analyzePetImage } from './src/server/geminiPetService.ts';
-import './src/server/freeLlmApiProvider.ts';
+// IA fija: solo Gemini. FreeLLMAPI ya no se importa: su registro
+// automático lo ponía primero en la cadena y alargaba cada análisis
+// con intentos lentos antes de llegar a Gemini.
 import { requireAuth, optionalAuth, AuthRequest } from './src/middleware/auth.ts';
 import { getOrCreateUser } from './src/db/users.ts';
 import { getUserPets, insertUserPet, deleteUserPet } from './src/db/pets.ts';

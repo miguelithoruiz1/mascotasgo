@@ -243,7 +243,10 @@ export class PetVisionOrchestrator {
   private providers: AIModelProvider[] = [];
 
   constructor() {
-    this.providers.push(new OpenAIVisionProvider());
+    // IA fija: sin proveedor por defecto. El único proveedor activo es
+    // Gemini, registrado por geminiPetService.ts al importarse en server.ts.
+    // Sin cadena de intentos: un intento, un tiempo de espera, error
+    // honesto si falla (en captura nunca se inventa una mascota).
   }
 
   public registerProvider(provider: AIModelProvider): void {

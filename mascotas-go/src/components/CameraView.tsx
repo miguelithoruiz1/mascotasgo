@@ -9,19 +9,15 @@ import {
   X,
   Radio,
   RefreshCw,
-  Dog,
-  Cat,
   Zap,
   Edit3,
   Heart,
   Award,
   Flame,
   Lightbulb,
-  Crosshair,
 } from 'lucide-react';
 import { PetRecord, PetSpecies, PetRarity, IdentificationResult } from '../types';
 import { sounds } from '../services/sound';
-import { generatePresetImage } from '../services/presetImages';
 
 interface CameraViewProps {
   onPetCaptured: (newPet: PetRecord) => void;
@@ -51,7 +47,7 @@ export const CameraView: React.FC<CameraViewProps> = ({
   const simCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const currentStreamRef = useRef<MediaStream | null>(null);
 
-  const [streamActive, setStreamActive] = useState<boolean>(false);
+  const [, setStreamActive] = useState<boolean>(false);
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   const [hasAttemptedCamera, setHasAttemptedCamera] = useState<boolean>(false);
   const [isHardwareCamera, setIsHardwareCamera] = useState<boolean>(false);
@@ -66,8 +62,9 @@ export const CameraView: React.FC<CameraViewProps> = ({
   const [capturePhase, setCapturePhase] = useState<CapturePhase>('idle');
   const [shakeCount, setShakeCount] = useState<number>(0);
 
-  // Live Vision Scanner State
-  const [liveDetection, setLiveDetection] = useState<LiveDetectionStatus>({
+  // Estado del visor. Sin escáner en vivo inventado: la única
+  // identificación real ocurre al capturar, con Gemini en el servidor.
+  const [liveDetection] = useState<LiveDetectionStatus>({
     active: true,
     isScanningFrame: false,
     hasPet: false,
@@ -75,13 +72,9 @@ export const CameraView: React.FC<CameraViewProps> = ({
     breed: null,
     estimatedCP: 260,
     catchDifficulty: 'Fácil',
-    message: 'Buscando mascotas con IA...',
+    message: 'Apunta a una mascota y toca CAPTURAR',
   });
-  const liveScanRunningRef = useRef<boolean>(false);
-  const previousHasPetRef = useRef<boolean>(false);
 
-  // AR Pet Simulation for rapid in-app testing
-  const [arPetType, setArPetType] = useState<'none' | 'dog' | 'cat'>('none');
 
   // Interactive Live AR background simulation if hardware camera is not available
   useEffect(() => {
@@ -243,155 +236,11 @@ export const CameraView: React.FC<CameraViewProps> = ({
         return null;
       }
 
-      // Draw AR pet if summoned
-      if (arPetType === 'dog') {
-        ctx.save();
-        ctx.fillStyle = '#facc15';
-        ctx.beginPath();
-        ctx.ellipse(width * 0.5, height * 0.55, 45, 50, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#ca8a04';
-        ctx.beginPath();
-        ctx.ellipse(width * 0.5 - 45, height * 0.55 - 5, 16, 35, -0.2, 0, Math.PI * 2);
-        ctx.ellipse(width * 0.5 + 45, height * 0.55 - 5, 16, 35, 0.2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#fef08a';
-        ctx.beginPath();
-        ctx.ellipse(width * 0.5, height * 0.55 + 15, 24, 20, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#1c1917';
-        ctx.beginPath();
-        ctx.arc(width * 0.5, height * 0.55 + 10, 7, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(width * 0.5 - 15, height * 0.55 - 10, 5, 0, Math.PI * 2);
-        ctx.arc(width * 0.5 + 15, height * 0.55 - 10, 5, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      } else if (arPetType === 'cat') {
-        ctx.save();
-        ctx.fillStyle = '#fffbeb';
-        ctx.beginPath();
-        ctx.ellipse(width * 0.5, height * 0.55, 42, 38, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#451a03';
-        ctx.beginPath();
-        ctx.moveTo(width * 0.5 - 35, height * 0.55 - 20);
-        ctx.lineTo(width * 0.5 - 50, height * 0.55 - 60);
-        ctx.lineTo(width * 0.5 - 15, height * 0.55 - 30);
-        ctx.closePath();
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(width * 0.5 + 35, height * 0.55 - 20);
-        ctx.lineTo(width * 0.5 + 50, height * 0.55 - 60);
-        ctx.lineTo(width * 0.5 + 15, height * 0.55 - 30);
-        ctx.closePath();
-        ctx.fill();
-        ctx.fillStyle = '#0284c7';
-        ctx.beginPath();
-        ctx.ellipse(width * 0.5 - 15, height * 0.55 - 5, 7, 5, 0, 0, Math.PI * 2);
-        ctx.ellipse(width * 0.5 + 15, height * 0.55 - 5, 7, 5, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-
       return canvas;
     },
-    [isHardwareCamera, arPetType]
+    [isHardwareCamera]
   );
 
-  // Live Vision Continuous AI Scanner
-  useEffect(() => {
-    if (!streamActive || capturedImage || isAnalyzing || capturePhase !== 'idle') return;
-
-    if (arPetType === 'dog' || arPetType === 'cat') {
-      const isCat = arPetType === 'cat';
-      if (!previousHasPetRef.current) {
-        sounds.playLockOn();
-      }
-      previousHasPetRef.current = true;
-      setLiveDetection({
-        active: true,
-        isScanningFrame: false,
-        hasPet: true,
-        species: isCat ? 'gato' : 'perro',
-        breed: isCat ? 'Siamés de Ojos Celestes (AR)' : 'Golden Retriever (AR)',
-        estimatedCP: isCat ? 390 : 450,
-        catchDifficulty: 'Fácil',
-        message: isCat ? '¡Gato en la mira!' : '¡Perro en la mira!',
-      });
-      return;
-    }
-
-    const interval = setInterval(() => {
-      if (liveScanRunningRef.current || capturePhase !== 'idle') return;
-
-      const canvas = captureCurrentFrameCanvas(320, 240);
-      if (!canvas) return;
-
-      liveScanRunningRef.current = true;
-      setLiveDetection((prev) => ({ ...prev, isScanningFrame: true }));
-
-      setTimeout(() => {
-        try {
-          const ctx = canvas.getContext('2d');
-          if (ctx) {
-            const pixelData = ctx.getImageData(110, 80, 100, 80).data;
-            let sumLuminance = 0;
-            for (let i = 0; i < pixelData.length; i += 16) {
-              sumLuminance += pixelData[i] + pixelData[i + 1] + pixelData[i + 2];
-            }
-            const avgLuminance = sumLuminance / (pixelData.length / 16);
-
-            const hasTarget = avgLuminance > 25 && avgLuminance < 720;
-            if (hasTarget) {
-              const isCat = Math.sin(Date.now() / 15000) > 0.1;
-              const cp = Math.floor(250 + (avgLuminance % 280));
-
-              if (!previousHasPetRef.current) {
-                sounds.playLockOn();
-              }
-              previousHasPetRef.current = true;
-
-              const detectedBreed = isCat
-                ? ['Siamés Elegante', 'Europeo Atigrado', 'Michi Naranjoso'][Math.floor((avgLuminance / 50) % 3)]
-                : ['Golden Retriever', 'Beagle Curioso', 'Bulldog Francés'][Math.floor((avgLuminance / 50) % 3)];
-
-              setLiveDetection({
-                active: true,
-                isScanningFrame: false,
-                hasPet: true,
-                species: isCat ? 'gato' : 'perro',
-                breed: detectedBreed,
-                estimatedCP: cp,
-                catchDifficulty: cp > 450 ? 'Difícil' : cp > 320 ? 'Media' : 'Fácil',
-                message: isCat
-                  ? `¡Gato detectado! (${detectedBreed})`
-                  : `¡Perro detectado! (${detectedBreed})`,
-              });
-            } else {
-              previousHasPetRef.current = false;
-              setLiveDetection((prev) => ({
-                ...prev,
-                isScanningFrame: false,
-                hasPet: false,
-                species: null,
-                breed: null,
-                message: 'Buscando mascotas con IA...',
-              }));
-            }
-          }
-        } catch (_err) {
-          // Ignore evaluation glitches
-        } finally {
-          liveScanRunningRef.current = false;
-          setLiveDetection((prev) => ({ ...prev, isScanningFrame: false }));
-        }
-      }, 400);
-    }, 2400);
-
-    return () => clearInterval(interval);
-  }, [streamActive, capturedImage, isAnalyzing, capturePhase, captureCurrentFrameCanvas, arPetType]);
 
   // Main Catch Trigger
   const handleCaptureAnimal = async () => {
@@ -400,17 +249,10 @@ export const CameraView: React.FC<CameraViewProps> = ({
     const canvas = captureCurrentFrameCanvas(960, 540);
     let photoDataUrl = '';
 
-    if (canvas) {
-      if (arPetType === 'dog') {
-        photoDataUrl = generatePresetImage('golden');
-      } else if (arPetType === 'cat') {
-        photoDataUrl = generatePresetImage('siamese');
-      } else {
-        photoDataUrl = canvas.toDataURL('image/jpeg', 0.82);
-      }
-    } else {
-      photoDataUrl = generatePresetImage('golden');
-    }
+    // Solo se analiza lo que la cámara realmente ve. Sin foto real no
+    // hay captura: antes aquí se colaba una imagen prefabricada.
+    if (!canvas) return;
+    photoDataUrl = canvas.toDataURL('image/jpeg', 0.82);
 
     setCapturedImage(photoDataUrl);
 
@@ -577,26 +419,11 @@ export const CameraView: React.FC<CameraViewProps> = ({
         {/* Center: Live Status & Vision Badge */}
         <div className="flex-1 max-w-[240px] xs:max-w-xs flex items-center justify-center">
           <div className="px-3 py-1.5 rounded-full bg-[#111827]/85 border border-[#1F2937] backdrop-blur-md shadow-lg flex items-center gap-2">
-            <span
-              className={`w-2 h-2 rounded-full ${
-                liveDetection.hasPet
-                  ? 'bg-[#F59E0B] shadow-[0_0_8px_#F59E0B] animate-pulse'
-                  : 'bg-[#10B981] shadow-[0_0_8px_#10B981]'
-              }`}
-            />
+            <span className="w-2 h-2 rounded-full bg-[#10B981] shadow-[0_0_8px_#10B981]" />
             <div className="min-w-0 flex items-center gap-1.5">
               <span className="text-[11px] font-bold text-white tracking-wide truncate">
-                {liveDetection.hasPet
-                  ? liveDetection.species === 'gato'
-                    ? '🐱 Gato en la mira'
-                    : '🐶 Perro en la mira'
-                  : 'Escáner AR Vision'}
+                Cámara lista
               </span>
-              {liveDetection.hasPet && (
-                <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black bg-[#F59E0B] text-slate-950 uppercase shrink-0">
-                  CP {liveDetection.estimatedCP}
-                </span>
-              )}
             </div>
           </div>
         </div>
@@ -665,39 +492,14 @@ export const CameraView: React.FC<CameraViewProps> = ({
           />
         )}
 
-        {/* AR Simulated Pet Graphic */}
-        {arPetType !== 'none' && !capturedImage && (
-          <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-15">
-            <div className="relative animate-bob">
-              <div className="w-48 h-48 rounded-3xl bg-[#1A2234]/70 border-2 border-[#F59E0B]/80 backdrop-blur-sm flex flex-col items-center justify-center shadow-[0_0_40px_rgba(245,158,11,0.5)]">
-                <span className="text-7xl drop-shadow-2xl">
-                  {arPetType === 'dog' ? '🐶' : '🐱'}
-                </span>
-                <span className="text-[11px] font-black text-[#F59E0B] mt-2 uppercase tracking-wider bg-[#090D16]/90 px-3 py-1 rounded-full border border-[#F59E0B]/50 shadow">
-                  {arPetType === 'dog' ? 'Golden Retriever AR' : 'Gato Siamés AR'}
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* RETICLE OVERLAY (Active while exploring) */}
         {!capturedImage && capturePhase === 'idle' && (
           <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-20">
             {/* Status Pill floating above crosshair */}
             <div className="absolute top-20 xs:top-24 px-4 py-1.5 rounded-full bg-[#111827]/85 border border-[#1F2937] backdrop-blur-md shadow-xl flex items-center gap-2">
-              {liveDetection.isScanningFrame ? (
-                <Sparkles className="w-3.5 h-3.5 text-[#10B981] animate-spin" />
-              ) : liveDetection.hasPet ? (
-                <Crosshair className="w-3.5 h-3.5 text-[#F59E0B] animate-pulse" />
-              ) : (
-                <Radio className="w-3.5 h-3.5 text-[#10B981] animate-pulse" />
-              )}
-              <span
-                className={`text-xs font-bold ${
-                  liveDetection.hasPet ? 'text-[#F59E0B]' : 'text-slate-200'
-                }`}
-              >
+              <Radio className="w-3.5 h-3.5 text-[#10B981] animate-pulse" />
+              <span className="text-xs font-bold text-slate-200">
                 {liveDetection.message}
               </span>
             </div>
@@ -707,60 +509,28 @@ export const CameraView: React.FC<CameraViewProps> = ({
               {/* impeccable-disable side-tab, border-accent-on-rounded: Tactical Target Frame viewfinder corners */}
               {/* Outer corner brackets */}
               <div
-                className={`absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 rounded-tl-lg transition-colors duration-300 ${
-                  liveDetection.hasPet
-                    ? 'border-[#F59E0B] shadow-[0_0_15px_rgba(245,158,11,0.7)]'
-                    : 'border-[#10B981]/70'
-                }`}
+                className={`absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 rounded-tl-lg transition-colors duration-300 border-[#10B981]/70`}
               />
               <div
-                className={`absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 rounded-tr-lg transition-colors duration-300 ${
-                  liveDetection.hasPet
-                    ? 'border-[#F59E0B] shadow-[0_0_15px_rgba(245,158,11,0.7)]'
-                    : 'border-[#10B981]/70'
-                }`}
+                className={`absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 rounded-tr-lg transition-colors duration-300 border-[#10B981]/70`}
               />
               <div
-                className={`absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 rounded-bl-lg transition-colors duration-300 ${
-                  liveDetection.hasPet
-                    ? 'border-[#F59E0B] shadow-[0_0_15px_rgba(245,158,11,0.7)]'
-                    : 'border-[#10B981]/70'
-                }`}
+                className={`absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 rounded-bl-lg transition-colors duration-300 border-[#10B981]/70`}
               />
               <div
-                className={`absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 rounded-br-lg transition-colors duration-300 ${
-                  liveDetection.hasPet
-                    ? 'border-[#F59E0B] shadow-[0_0_15px_rgba(245,158,11,0.7)]'
-                    : 'border-[#10B981]/70'
-                }`}
+                className={`absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 rounded-br-lg transition-colors duration-300 border-[#10B981]/70`}
               />
 
               {/* Pulsing circular guide */}
               <div
-                className={`w-40 h-40 rounded-full border transition-all duration-300 flex items-center justify-center ${
-                  liveDetection.hasPet
-                    ? 'border-[#F59E0B] shadow-[0_0_25px_rgba(245,158,11,0.8)] scale-105'
-                    : 'border-[#10B981]/40'
-                }`}
+                className={`w-40 h-40 rounded-full border transition-all duration-300 flex items-center justify-center border-[#10B981]/40`}
               >
                 <div
-                  className={`w-2.5 h-2.5 rounded-full transition-colors duration-300 ${
-                    liveDetection.hasPet
-                      ? 'bg-[#F59E0B] shadow-[0_0_10px_#F59E0B]'
-                      : 'bg-[#10B981]/80'
-                  }`}
+                  className={`w-2.5 h-2.5 rounded-full transition-colors duration-300 bg-[#10B981]/80`}
                 />
               </div>
 
-              {/* Lock-on Badge */}
-              {liveDetection.hasPet && (
-                <div className="absolute -bottom-10 px-3.5 py-1 rounded-full bg-[#111827] border border-[#F59E0B] text-[#F59E0B] font-black text-xs uppercase tracking-wider shadow-2xl flex items-center gap-1.5 animate-bob">
-                  <span>🎯 ¡OBJETIVO LISTO!</span>
-                  <span className="text-[10px] text-white bg-[#1A2234] px-1.5 py-0.5 rounded-md">
-                    {liveDetection.breed}
-                  </span>
-                </div>
-              )}
+
             </div>
           </div>
         )}
@@ -845,45 +615,6 @@ export const CameraView: React.FC<CameraViewProps> = ({
       {/* BOTTOM CONTROLS BAR (Capture Trigger & Testing) */}
       {!capturedImage && capturePhase === 'idle' && (
         <div className="relative z-30 pb-safe pt-2 px-4 sm:px-6 bg-gradient-to-t from-[#090D16] via-[#090D16]/90 to-transparent flex flex-col gap-2">
-          {/* Quick AR simulation controls */}
-          <div className="flex items-center justify-between px-2">
-            <span className="text-[11px] font-semibold text-slate-400 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-[#F59E0B]" />
-              <span>Simulación RA para pruebas:</span>
-            </span>
-            <div className="flex items-center gap-1.5">
-              <button
-                onClick={() => {
-                  sounds.playTap();
-                  setArPetType((prev) => (prev === 'dog' ? 'none' : 'dog'));
-                }}
-                className={`px-2.5 py-1 rounded-xl text-[11px] font-bold border transition-all active:scale-95 flex items-center gap-1 ${
-                  arPetType === 'dog'
-                    ? 'bg-[#F59E0B] text-slate-950 border-[#F59E0B]'
-                    : 'bg-[#111827] border-[#1F2937] text-slate-300'
-                }`}
-              >
-                <Dog className="w-3.5 h-3.5" />
-                <span>Perro</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  sounds.playTap();
-                  setArPetType((prev) => (prev === 'cat' ? 'none' : 'cat'));
-                }}
-                className={`px-2.5 py-1 rounded-xl text-[11px] font-bold border transition-all active:scale-95 flex items-center gap-1 ${
-                  arPetType === 'cat'
-                    ? 'bg-[#F59E0B] text-slate-950 border-[#F59E0B]'
-                    : 'bg-[#111827] border-[#1F2937] text-slate-300'
-                }`}
-              >
-                <Cat className="w-3.5 h-3.5" />
-                <span>Gato</span>
-              </button>
-            </div>
-          </div>
-
           {/* Main Shutter Row */}
           <div className="flex items-center justify-between py-2">
             {/* Left secondary button: Flip Camera */}
@@ -900,31 +631,18 @@ export const CameraView: React.FC<CameraViewProps> = ({
             <div className="flex flex-col items-center">
               <button
                 onClick={handleCaptureAnimal}
-                className={`w-20 h-20 rounded-full p-1.5 shadow-2xl transition-all duration-200 active:scale-90 flex items-center justify-center ${
-                  liveDetection.hasPet
-                    ? 'bg-gradient-to-tr from-[#F59E0B] via-yellow-400 to-[#F59E0B] ring-4 ring-[#F59E0B]/70 shadow-[0_0_40px_rgba(245,158,11,0.8)] scale-105 animate-pulse'
-                    : 'bg-gradient-to-tr from-[#10B981] via-[#14B8A6] to-[#10B981] ring-4 ring-[#10B981]/40 shadow-[0_0_30px_rgba(16,185,129,0.5)]'
-                }`}
+                className="w-20 h-20 rounded-full p-1.5 shadow-2xl transition-all duration-200 active:scale-90 flex items-center justify-center bg-gradient-to-tr from-[#10B981] via-[#14B8A6] to-[#10B981] ring-4 ring-[#10B981]/40 shadow-[0_0_30px_rgba(16,185,129,0.5)]"
                 title="Capturar mascota"
                 aria-label="Capturar mascota"
               >
                 <div className="w-full h-full rounded-full bg-[#111827] border-3 border-white/90 flex items-center justify-center shadow-inner relative overflow-hidden">
-                  {/* Subtle dynamic glow ring */}
-                  <div
-                    className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
-                      liveDetection.hasPet ? 'bg-[#F59E0B]' : 'bg-[#10B981]'
-                    }`}
-                  >
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center transition-colors bg-[#10B981]">
                     <Camera className="w-5 h-5 text-slate-950" />
                   </div>
                 </div>
               </button>
-              <span
-                className={`text-[10px] font-black mt-1 uppercase tracking-wider ${
-                  liveDetection.hasPet ? 'text-[#F59E0B] animate-bob' : 'text-[#10B981]'
-                }`}
-              >
-                {liveDetection.hasPet ? '¡ATRAPAR AHORA!' : 'CAPTURAR'}
+              <span className="text-[10px] font-black mt-1 uppercase tracking-wider text-[#10B981]">
+                CAPTURAR
               </span>
             </div>
 
